@@ -4,96 +4,237 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
-<title>Poste Tardiane – Tracciamento spedizione</title>
+<title>Istituto Impopolare contro le Poste Italiane – Validazione telematica</title>
+<link rel="icon" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&family=Titillium+Web:ital,wght@0,400;0,700;0,900;1,400;1,700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --blu: #004B93;
-    --giallo: #FFDD00;
-    --carta: #FFF9DB;
-    --inchiostro: #14213D;
+    --carta: #F7F0C6;
+    --carta-scura: #EFE5A8;
+    --blu: #0B5CA5;
+    --blu-scuro: #0A3D75;
+    --oro: #C9A44C;
+    --inchiostro: #12294A;
   }
   * { box-sizing: border-box; }
-  html, body { margin: 0; min-height: 100%; }
+  html, body { margin: 0; }
   body {
-    background: var(--blu);
+    min-height: 100vh;
+    background: var(--blu-scuro);
     color: var(--inchiostro);
-    font-family: "Montserrat", "Segoe UI", Roboto, Arial, sans-serif;
+    font-family: "Titillium Web", "Segoe UI", Roboto, Arial, sans-serif;
+    padding: 18px 12px 32px;
     display: flex;
     justify-content: center;
-    padding: 24px 16px;
   }
   main {
     width: 100%;
-    max-width: 480px;
-    background: var(--carta);
-    border: 4px solid var(--giallo);
-    border-radius: 10px;
-    padding: 24px 20px 28px;
+    max-width: 520px;
     align-self: flex-start;
-  }
-  header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
-  .logo {
-    width: 52px; height: 52px; flex: none;
-    border-radius: 50%;
-    background: var(--giallo);
+    background:
+      radial-gradient(circle at 20% 10%, rgba(255,255,255,.35), transparent 55%),
+      var(--carta);
     border: 3px solid var(--blu);
-    display: grid; place-items: center;
-    font-size: 28px;
-  }
-  h1 { margin: 0; font-size: 1.3rem; font-weight: 800; color: var(--blu); line-height: 1.1; }
-  header p { margin: 2px 0 0; font-size: .78rem; font-style: italic; }
-  .scheda {
-    background: #fff;
-    border: 2px solid var(--blu);
+    outline: 3px solid var(--oro);
+    outline-offset: -9px;
     border-radius: 6px;
-    padding: 14px;
-    font-family: "Courier Prime", "Courier New", monospace;
-    font-size: .95rem;
-    line-height: 1.6;
+    padding: 28px 22px 30px;
   }
-  .scheda b { color: var(--blu); }
-  h2 { font-size: 1rem; margin: 22px 0 8px; color: var(--blu); }
-  .barra {
-    height: 18px;
-    background: #fff;
+  header { text-align: center; }
+  header img { width: 92px; height: 92px; }
+  h1 {
+    margin: 10px 0 2px;
+    font-size: 1.45rem;
+    font-weight: 900;
+    line-height: 1.1;
+    color: var(--blu);
+    text-transform: uppercase;
+  }
+  .sotto { margin: 0; font-size: .9rem; color: var(--blu-scuro); }
+  hr { border: 0; border-top: 2px dashed var(--blu); opacity: .35; margin: 20px 0; }
+  h2 { font-size: 1.15rem; font-style: italic; font-weight: 700; color: var(--blu); margin: 0 0 8px; }
+  p { line-height: 1.45; margin: 0 0 12px; }
+  .piccolo { font-size: .78rem; opacity: .8; }
+  .mono { font-family: "Roboto Mono", "Courier New", monospace; font-size: .85rem; }
+  .scheda {
+    background: rgba(255,255,255,.55);
     border: 2px solid var(--blu);
-    border-radius: 9px;
-    overflow: hidden;
+    border-radius: 8px;
+    padding: 14px;
+    margin: 14px 0;
   }
-  .barra span {
-    display: block; height: 100%; width: 73%;
-    background: var(--giallo);
-    border-right: 2px solid var(--blu);
+  button, .btn {
+    display: block; width: 100%;
+    font: inherit; font-weight: 700; font-size: 1.05rem;
+    text-align: center; text-decoration: none;
+    color: #fff; background: var(--blu);
+    border: 0; border-bottom: 4px solid var(--blu-scuro);
+    border-radius: 8px; padding: 13px 14px; margin: 10px 0;
+    cursor: pointer;
   }
-  .stato { font-size: .85rem; margin: 8px 0 0; }
-  footer { margin-top: 24px; font-size: .78rem; opacity: .8; }
+  button:active, .btn:active { transform: translateY(2px); }
+  button.opz { background: #fff; color: var(--blu-scuro); border: 2px solid var(--blu); border-bottom-width: 4px; text-align: left; font-weight: 400; }
+  .btn.spento { background: #9aa9bb; border-bottom-color: #7b8a9d; pointer-events: none; }
+  .barra { height: 16px; background: #fff; border: 2px solid var(--blu); border-radius: 8px; overflow: hidden; margin: 12px 0 6px; }
+  .barra span { display: block; height: 100%; width: 0; background: var(--oro); transition: width .5s ease; }
+  .cifre { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; font-weight: 700; color: var(--blu-scuro); }
+  .cifre div { background: #FBF3C0; border: 2px solid var(--blu); border-radius: 8px; padding: 10px 4px; font-size: .9rem; }
+  .cifre b { display: block; font-size: 1.05rem; word-break: break-all; }
+  .timbro {
+    width: 118px; height: 118px; margin: 4px auto 0; border-radius: 50%;
+    border: 4px double var(--blu); color: var(--blu);
+    display: grid; place-content: center; text-align: center;
+    font-weight: 900; font-size: .72rem; line-height: 1.25; text-transform: uppercase;
+    transform: rotate(-9deg); opacity: .85;
+  }
+  .timbro b { font-size: 1.05rem; }
+  [hidden] { display: none !important; }
+  @media (prefers-color-scheme: dark) {
+    /* la pagina resta volutamente su carta chiara, come l'assegno stampato */
+    body { background: #082B52; }
+  }
 </style>
 </head>
 <body>
 <main>
   <header>
-    <div class="logo" aria-hidden="true">🐌</div>
-    <div>
-      <h1>POSTE TARDIANE</h1>
-      <p>Società per azioni, ma solo per le azioni di ritiro</p>
-    </div>
+    <img src="logo.png" alt="Logo dell’Istituto Impopolare contro le Poste Italiane">
+    <h1>Istituto Impopolare<br>contro le Poste Italiane</h1>
+    <p class="sotto">Società per azioni, ma solo azioni violente</p>
   </header>
+  <hr>
 
-  <div class="scheda">
-    <b>Pratica:</b> Assegno N° 000012<br>
-    <b>Destinatario:</b> Marco Lupinetti<br>
-    <b>Stato:</b> in transito (forse)
-  </div>
+  <!-- Schermata 1: buono -->
+  <section id="s1">
+    <h2>Buono sconto da 0,20 $ alla Coop</h2>
+    <p>Hai scansionato il codice, quindi hai diritto al buono. Valido solo oggi, ma solo a Cesena.</p>
+    <div class="scheda mono">
+      Pratica: Assegno N° 0000012<br>
+      Intestatario: Dott. Marco Lupinetti<br>
+      Stato: in attesa di validazione telematica
+    </div>
+    <p class="piccolo">(tranquillo, non è una truffa) {credo}</p>
+    <button id="avvia">Riscatta il buono</button>
+  </section>
 
-  <h2>Avanzamento consegna</h2>
-  <div class="barra" role="progressbar" aria-valuenow="73" aria-valuemin="0" aria-valuemax="100">
-    <span></span>
-  </div>
-  <p class="stato">73% completato. Il postino ha suonato, il citofono era rotto.</p>
+  <!-- Schermata 2: domande -->
+  <section id="s2" hidden>
+    <h2 id="titoloDomanda">Validazione telematica</h2>
+    <div class="barra" aria-hidden="true"><span id="avanz"></span></div>
+    <p class="piccolo" id="contatore"></p>
+    <p id="testoDomanda"></p>
+    <div id="opzioni"></div>
+    <p id="risposta" class="scheda" hidden></p>
+    <button id="avanti" hidden>Avanti</button>
+  </section>
 
-  <footer>
-    La pratica è in aggiornamento. Torna a controllare tra poco.
-  </footer>
+  <!-- Schermata 3: certificato + link -->
+  <section id="s3" hidden>
+    <div class="timbro"><span>Revolut<br>approved<br><b>23 ottobre<br>2026</b></span></div>
+    <h2 style="text-align:center;margin-top:14px">Certificato di rimborso condizionato</h2>
+    <p style="text-align:center">Validazione completata. Il buono da 0,20 $ è sparito, ma il rimborso a favore del <b>Dott. Marco Lupinetti</b> si può attivare qui sotto.</p>
+    <div class="cifre">
+      <div>BTC<b>0,00574323676767</b></div>
+      <div>Patate<b>220 kg</b></div>
+      <div>Pane<b>89 kg</b></div>
+    </div>
+    <p class="piccolo" style="margin-top:10px">Importi soggetti a crollo, volatilità e inflazione.</p>
+    <hr>
+    <h2>Scegli come contribuire</h2>
+    <div id="link"></div>
+    <p class="piccolo">Il pagamento si apre nell’app o nel sito di Revolut. Contribuire è facoltativo e totalmente volontario.</p>
+  </section>
 </main>
+
+<script>
+/* ============================================================
+   MODIFICA QUI: domande e link di pagamento
+   ============================================================ */
+
+// Ogni domanda ha un testo, le opzioni e la battuta di risposta.
+// Non ci sono risposte sbagliate: la battuta compare comunque.
+const DOMANDE = [
+  {
+    testo: "Quanto tempo hai passato in coda alle Poste nella tua vita?",
+    opzioni: ["Pochi minuti", "Qualche ora", "Un semestre intero", "Sto ancora aspettando"],
+    risposta: "Risposta registrata. L’Istituto la inoltra in giacenza, ritirabile dalle 13:35 alle 13:36."
+  },
+  {
+    testo: "Chi merita davvero il merito di questa laurea?",
+    opzioni: ["Marco, ovviamente", "Il caffè", "Gli appunti degli altri", "Il cane (ha vinto)"],
+    risposta: "Domanda neutra, risposta irrilevante. Il cane però ha già vinto."
+  },
+  {
+    testo: "Conosci la password del tuo Wi-Fi?",
+    opzioni: ["Sì", "No", "Solo a memoria visiva", "Chiedo a un amico"],
+    risposta: "Verifica superata. Non era collegata a nessuna procedura."
+  }
+];
+
+// Link di pagamento Revolut: sostituisci gli url vuoti con i tuoi.
+// Se url è "" il pulsante resta spento con la scritta "in arrivo".
+const LINK = [
+  { etichetta: "Contribuisci con 5 €",  url: "" },
+  { etichetta: "Contribuisci con 10 €", url: "" },
+  { etichetta: "Contribuisci con 20 €", url: "" },
+  { etichetta: "Importo libero",        url: "" }
+];
+
+/* ============================================================
+   Logica (non serve toccarla)
+   ============================================================ */
+const $ = id => document.getElementById(id);
+let i = 0;
+
+function mostra(id) {
+  ["s1", "s2", "s3"].forEach(s => { $(s).hidden = (s !== id); });
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function disegnaDomanda() {
+  const d = DOMANDE[i];
+  $("contatore").textContent = "Domanda " + (i + 1) + " di " + DOMANDE.length;
+  $("avanz").style.width = (i / DOMANDE.length * 100) + "%";
+  $("testoDomanda").textContent = d.testo;
+  $("risposta").hidden = true;
+  $("avanti").hidden = true;
+  $("avanti").textContent = (i === DOMANDE.length - 1) ? "Concludi la validazione" : "Avanti";
+  const box = $("opzioni");
+  box.textContent = "";
+  d.opzioni.forEach(t => {
+    const b = document.createElement("button");
+    b.className = "opz";
+    b.textContent = t;
+    b.onclick = () => {
+      box.querySelectorAll("button").forEach(x => { x.disabled = true; });
+      $("risposta").textContent = d.risposta;
+      $("risposta").hidden = false;
+      $("avanti").hidden = false;
+    };
+    box.appendChild(b);
+  });
+}
+
+function disegnaLink() {
+  const box = $("link");
+  LINK.forEach(l => {
+    const a = document.createElement("a");
+    a.className = "btn" + (l.url ? "" : " spento");
+    a.textContent = l.url ? l.etichetta : l.etichetta + " (link in arrivo)";
+    if (l.url) { a.href = l.url; a.target = "_blank"; a.rel = "noopener noreferrer"; }
+    box.appendChild(a);
+  });
+}
+
+$("avvia").onclick = () => { i = 0; disegnaDomanda(); mostra("s2"); };
+$("avanti").onclick = () => {
+  i++;
+  if (i < DOMANDE.length) { disegnaDomanda(); }
+  else { $("avanz").style.width = "100%"; mostra("s3"); }
+};
+disegnaLink();
+</script>
 </body>
 </html>
