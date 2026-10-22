@@ -282,12 +282,13 @@ const PALIO = [
 ];
 const SUONI = ["", "papi.mp3", "love.mp3", "massimo.mp3", "sucarica.mp3", "pescio.mp3"];
 const PREMIO_FILE = "roll.mp3";
+const SUCA_AUDIO_FILE = "suca.mp3"; // 🔊 Audio associato al tasto "Suca"
 const LINK = ["", "", "", "", "", ""];
 const DOMANDE = [
   { testo: "Quanto fa 2 + 2?",                     opzioni: ["Pesce", "Banana", "Gianfranco", "4(no)"],               giusta: 2 },
   { testo: "Qual è la capitale d’Italia?",         opzioni: ["Milano (Berlusconi)", "Milano marittima", "Ancona", "Penne"], giusta: 0 },
   { testo: "L'uomo pesce esiste veramente?",   opzioni: ["Forse", "Sono io", "Si nasconte sotto al lago", "Sei tu sotto copertura"],   giusta: 3 },
-  { testo: "Le tasse vanno pagate",      opzioni: ["No (sono nullatenente)", "All'agenzia dell'entrate", "Sono cattolico", "Sono un cittadino onesto"], giusta: 2 },
+  { testo: "Le tasse vanno pagate",       opzioni: ["No (sono nullatenente)", "All'agenzia dell'entrate", "Sono cattolico", "Sono un cittadino onesto"], giusta: 2 },
   { testo: "Ti trovi nel bosco, devi decidere chi affrontare",   opzioni: ["Un uomo a caso che squarta i polli", "Un velociraptor", "Un comunista", "Benjamin Netanyahu"], giusta: 1 },
   { testo: "Qual è il tuo animale domestico preferito?",   opzioni: ["Bill Gates","Una rana velenosa ma la spacci come innocua","Renzi", "Thomas Marinucci"], giusta: 1 }
 ];
@@ -297,8 +298,19 @@ const euro = n => n.toLocaleString("it-IT", { minimumFractionDigits: (n % 1 ? 2 
 const VIDEO_ID = "dQw4w9WgXcQ";
 let i = 0;
 let gagVisto = false;
+
+// 🔊 Gestore centralizzato dell'audio per evitare sovrapposizioni
+let currentAudio = null;
+function fermaAudioCorrente() {
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.currentTime = 0;
+    currentAudio = null;
+  }
+}
  
 function mostra(id) {
+  fermaAudioCorrente(); // Ferma l'audio se si cambia schermata
   ["s1", "s2", "s3", "s4"].forEach(s => { $(s).hidden = (s !== id); });
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
@@ -374,6 +386,7 @@ window.addEventListener("resize", () => { if (!timerAvviato || pronto) centra();
  
 /* Quiz */
 function disegnaDomanda() {
+  fermaAudioCorrente(); // Ferma l'audio precedente se si cambia domanda
   const d = DOMANDE[i];
   $("contatore").textContent = "Domanda " + (i + 1) + " di " + DOMANDE.length + " · in palio: " + PALIO[i];
   $("avanz").style.width = (i / DOMANDE.length * 100) + "%";
@@ -409,7 +422,16 @@ function rispondi(b, k) {
   $("esito").hidden = false;
   disegnaPremio();
   $("avanti").hidden = false;
-  if (SUONI[i]) { try { new Audio(SUONI[i]).play().catch(() => {}); } catch (e) {} }
+  
+  // 🔊 Ferma eventuali audio precedenti e riproduce quello della risposta corretta
+  fermaAudioCorrente();
+  if (SUONI[i]) {
+    try {
+      currentAudio = new Audio(SUONI[i]);
+      currentAudio.play().catch(() => {});
+    } catch (e) {}
+  }
+  
   if (i === DOMANDE.length - 1) festa();
 }
  
@@ -590,6 +612,14 @@ $("audio").onclick = () => {
 };
  
 $("continua").onclick = () => {
+  // 🔊 Riproduce l'audio associato al tasto "Suca" prima di procedere
+  if (SUCA_AUDIO_FILE) {
+    try {
+      const sucaAudio = new Audio(SUCA_AUDIO_FILE);
+      sucaAudio.play().catch(() => {});
+    } catch (e) {}
+  }
+
   gagVisto = true;
   fermaVideo();
   $("ritira").hidden = false;
