@@ -67,12 +67,12 @@
   button:disabled { cursor: default; }
   .btn.spento { background: #9aa9bb; border-bottom-color: #7b8a9d; pointer-events: none; }
   .btn.oro { background: var(--oro); color: #3b2c05; border-bottom-color: #8d7226; }
-
+ 
   /* pulsante che scappa */
   #campo { position: relative; height: 200px; margin: 8px 0 4px; overflow: hidden; }
   #avvia { position: absolute; width: 72%; margin: 0; transition: left .07s linear, top .07s linear, width .07s linear, padding .07s linear, font-size .07s linear; touch-action: manipulation; white-space: nowrap; }
   #suggerimento { text-align: center; font-size: .85rem; min-height: 1.3em; margin: 0; font-style: italic; }
-
+ 
   .barra { height: 16px; background: #fff; border: 2px solid var(--blu); border-radius: 8px; overflow: hidden; margin: 12px 0 6px; }
   .barra span { display: block; height: 100%; width: 0; background: var(--oro); transition: width .5s ease; }
   .cifre { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; font-weight: 700; color: var(--blu-scuro); }
@@ -85,6 +85,56 @@
   .video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
   .vinto { text-align: center; }
   .vinto h2 { font-size: 1.5rem; font-style: normal; font-weight: 900; text-transform: uppercase; color: var(--no); }
+  
+  /* Animazione scena finale */
+  #festa { position: fixed; inset: 0; z-index: 50; background: linear-gradient(#070b24, #1d2b64 70%, #3a4f9a); display: flex; align-items: center; justify-content: center; }
+  #fuochi { position: absolute; inset: 0; width: 100%; height: 100%; }
+  #scena { position: relative; width: 100%; max-width: 560px; height: auto; overflow: visible; }
+  
+  #aereo { animation: vola 2.1s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+  @keyframes vola {
+    0% { transform: translateX(-280px); }
+    100% { transform: translateX(130px); }
+  }
+
+  /* Animazione di crollo delle torri grigie */
+  @keyframes collassoTorre {
+    0% { transform: translateY(0) scaleY(1); }
+    30% { transform: translateY(4px) scaleY(0.96); }
+    100% { transform: translateY(120px) scaleY(0.1); opacity: 0.25; }
+  }
+  .torre-crolla {
+    animation: collassoTorre 0.8s cubic-bezier(0.6, 0, 0.9, 1) forwards;
+    transform-origin: bottom center;
+  }
+
+  /* Animazione esplosione */
+  @keyframes esplosioneImpatto {
+    0% { transform: scale(0.1); opacity: 0; }
+    30% { transform: scale(1.4); opacity: 1; }
+    100% { transform: scale(2.4); opacity: 0; }
+  }
+  #esplosione {
+    transform-origin: 200px 135px;
+    opacity: 0;
+  }
+  .attiva-esplosione {
+    animation: esplosioneImpatto 0.7s ease-out forwards;
+  }
+
+  /* Scossione dello schermo */
+  @keyframes scuotiScena {
+    0%, 100% { transform: translate(0, 0); }
+    15% { transform: translate(-8px, 6px); }
+    30% { transform: translate(8px, -6px); }
+    45% { transform: translate(-6px, -4px); }
+    60% { transform: translate(6px, 4px); }
+    80% { transform: translate(-3px, 2px); }
+  }
+  .impatto-scossa { animation: scuotiScena 0.6s ease-in-out; }
+
+  #chiudiFesta { position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%); width: auto; padding: 12px 28px; z-index: 60; }
+  @media (prefers-reduced-motion: reduce) { #aereo { animation-duration: 0.01s; } }
   [hidden] { display: none !important; }
 </style>
 </head>
@@ -96,7 +146,7 @@
     <p class="sotto">Società per azioni, ma solo azioni violente</p>
   </header>
   <hr>
-
+ 
   <!-- Schermata 1: buono con pulsante che scappa -->
   <section id="s1">
     <h2>Buono sconto da 0,20 $ alla Coop*</h2>
@@ -108,9 +158,9 @@
     </div>
     <div id="campo"><button id="avvia" type="button">Riscatta il buono</button></div>
     <p id="suggerimento" aria-live="polite"></p>
-    <p class="piccolo" style="margin-top:14px">* stai per essere truffato</p>
+    <p class="piccolo" style="margin-top:14px">*stai per essere truffato</p>
   </section>
-
+ 
   <!-- Schermata 2: quiz a 8 domande -->
   <section id="s2" hidden>
     <h2>Validazione telematica</h2>
@@ -125,7 +175,7 @@
     </div>
     <button id="avanti" type="button" hidden>Avanti</button>
   </section>
-
+ 
   <!-- Schermata 4: il premio fasullo -->
   <section id="s4" hidden class="vinto">
     <h2>Hai vinto!</h2>
@@ -139,7 +189,7 @@
       <button id="continua" type="button">Suca</button>
     </div>
   </section>
-
+ 
   <!-- Schermata 3: certificato finale -->
   <section id="s3" hidden>
     <div class="timbro"><span>Revolut<br>approved<br><b>23 ottobre<br>2026</b></span></div>
@@ -153,63 +203,111 @@
     <p class="piccolo" style="margin-top:10px">Importi soggetti a crollo, volatilità e inflazione.</p>
   </section>
 </main>
+ 
+<!-- Festa finale: aereo realistico, impatto e crollo torri grigie -->
+<div id="festa" hidden>
+  <canvas id="fuochi"></canvas>
+  <svg id="scena" viewBox="0 0 400 300" role="img" aria-label="Impatto aereo e distruzione delle torri">
+    <rect x="0" y="278" width="400" height="22" fill="#0A3D75"/>
+    
+    <!-- Torre 1 Grigia (Stile Grattacielo Acciaio) -->
+    <g id="t1" class="torre">
+      <rect x="110" y="70" width="45" height="208" fill="#78909c" stroke="#37474f" stroke-width="2"/>
+      <!-- Griglia finestre -->
+      <line x1="125" y1="70" x2="125" y2="278" stroke="#546e7a" stroke-width="2"/>
+      <line x1="140" y1="70" x2="140" y2="278" stroke="#546e7a" stroke-width="2"/>
+      <line x1="110" y1="105" x2="155" y2="105" stroke="#455a64" stroke-width="2"/>
+      <line x1="110" y1="140" x2="155" y2="140" stroke="#455a64" stroke-width="2"/>
+      <line x1="110" y1="175" x2="155" y2="175" stroke="#455a64" stroke-width="2"/>
+      <line x1="110" y1="210" x2="155" y2="210" stroke="#455a64" stroke-width="2"/>
+      <line x1="110" y1="245" x2="155" y2="245" stroke="#455a64" stroke-width="2"/>
+    </g>
+    
+    <!-- Torre 2 Grigia (Identica e simmetrica) -->
+    <g id="t2" class="torre">
+      <rect x="245" y="70" width="45" height="208" fill="#78909c" stroke="#37474f" stroke-width="2"/>
+      <!-- Griglia finestre -->
+      <line x1="260" y1="70" x2="260" y2="278" stroke="#546e7a" stroke-width="2"/>
+      <line x1="275" y1="70" x2="275" y2="278" stroke="#546e7a" stroke-width="2"/>
+      <line x1="245" y1="105" x2="290" y2="105" stroke="#455a64" stroke-width="2"/>
+      <line x1="245" y1="140" x2="290" y2="140" stroke="#455a64" stroke-width="2"/>
+      <line x1="245" y1="175" x2="290" y2="175" stroke="#455a64" stroke-width="2"/>
+      <line x1="245" y1="210" x2="290" y2="210" stroke="#455a64" stroke-width="2"/>
+      <line x1="245" y1="245" x2="290" y2="245" stroke="#455a64" stroke-width="2"/>
+    </g>
+    
+    <!-- Effetto Esplosione / Fumo centrale -->
+    <g id="esplosione">
+      <circle cx="200" cy="135" r="35" fill="#ff4500" opacity="0.9"/>
+      <circle cx="190" cy="125" r="24" fill="#ffa500" opacity="0.95"/>
+      <circle cx="210" cy="140" r="30" fill="#ffff00" opacity="0.95"/>
+      <path d="M165,155 Q200,70 235,155" fill="#263238" opacity="0.85"/>
+    </g>
 
+    <!-- Aereo Realistico Vettoriale (con striscione) -->
+    <g id="aereo">
+      <g transform="translate(-250 42)">
+        <rect x="0" y="0" width="215" height="30" rx="3" fill="#FFF9DB" stroke="#0B5CA5" stroke-width="2"/>
+        <text x="107" y="20" text-anchor="middle" font-size="13" font-weight="900" fill="#0B5CA5" font-family="Titillium Web, Arial, sans-serif">CONGRATULAZIONI DOTTORE!</text>
+        <line x1="215" y1="15" x2="240" y2="15" stroke="#0A3D75" stroke-width="2"/>
+      </g>
+      
+      <!-- Sagoma Aereo di Linea (Vettore SVG dettagliato) -->
+      <g transform="translate(-10, 50) scale(1.1)">
+        <!-- Fusoliera -->
+        <path d="M 0,7 C 15,7 45,4 75,7 C 82,8 84,10 82,12 C 78,14 45,12 0,12 Z" fill="#b0bec5" stroke="#263238" stroke-width="1.2"/>
+        <!-- Muso -->
+        <path d="M 75,7 L 85,9.5 L 75,12 Z" fill="#90a4ae" stroke="#263238" stroke-width="1"/>
+        <!-- Ala Principale -->
+        <path d="M 35,9.5 L 22,-8 L 42,-5 L 52,9.5 Z" fill="#cfd8dc" stroke="#263238" stroke-width="1"/>
+        <!-- Stabilizzatore di coda -->
+        <path d="M 8,7 L 3,-4 L 16,1 L 12,7 Z" fill="#78909c" stroke="#263238" stroke-width="1"/>
+        <!-- Stabilizzatore orizzontale -->
+        <path d="M 7,9.5 L 2,6 L 12,8 Z" fill="#90a4ae"/>
+      </g>
+    </g>
+  </svg>
+  <button id="chiudiFesta" type="button">Continua</button>
+</div>
+ 
 <script>
-/* ============================================================
-   MODIFICA QUI: domande, importi e link di pagamento
-   ============================================================ */
-
-// Importi dei livelli (somma = 438 €). Cambiali se vuoi.
-const IMPORTI = [0.20, 0.40, 0.80, 1.60, 3.20, 6.40, 125.40, 300];   // somma = 438 €
-
-// Come viene scritto il premio "in palio" (sempre in un\u2019altra valuta).
-// Cambi usati: 1 € = 1.936,27 lire; 1 € = circa 1.705 pesos argentini; 1 BTC = circa 76.260 €.
+const IMPORTI = [1, 2, 5, 10, 120, 300];
 const PALIO = [
-  "387 lire",
-  "0,00000524 BTC",
-  "1.364 pesos argentini",
-  "3.098 lire",
-  "0,00004196 BTC",
-  "10.914 pesos argentini",
+  "1.936 lire",
+  "0,00002623 BTC",
+  "8.526 pesos argentini",
+  "1.664 pesetas",
   "una quota di azioni SpaceX (valore garantito dalla nostra parola)",
-  "580.881 lire"
+  "102.225 dracme"
 ];
-
-// Link Revolut, uno per ogni livello, nello stesso ordine degli importi.
-// Se è "" il pulsante resta spento con la scritta "link in arrivo".
-const LINK = ["https://revolut.me/p/IINhsdfMzj", "", "", "", "", "", "", ""];
-
-// DOMANDE DI PROVA: sostituiscile. "giusta" è la posizione (0 = prima opzione).
+const SUONI = ["", "papi.mp3", "love.mp3", "massimo.mp3", "sucarica.mp3", "pescio.mp3"];
+const PREMIO_FILE = "roll.mp3";
+const LINK = ["", "", "", "", "", ""];
 const DOMANDE = [
-  { testo: "[PROVA 1] Quanto fa 2 + 2?",                     opzioni: ["3", "4", "5", "22"],               giusta: 1 },
-  { testo: "[PROVA 2] Qual è la capitale d’Italia?",         opzioni: ["Milano", "Roma", "Cesena", "Penne"], giusta: 1 },
-  { testo: "[PROVA 3] Di che colore è il cavallo bianco?",   opzioni: ["Bianco", "Nero", "Giallo", "Blu"],   giusta: 0 },
-  { testo: "[PROVA 4] Domanda di prova numero quattro",      opzioni: ["A", "B", "C", "D"],                 giusta: 2 },
-  { testo: "[PROVA 5] Domanda di prova numero cinque",       opzioni: ["A", "B", "C", "D"],                 giusta: 0 },
-  { testo: "[PROVA 6] Domanda di prova numero sei",          opzioni: ["A", "B", "C", "D"],                 giusta: 3 },
-  { testo: "[PROVA 7] Domanda di prova numero sette",        opzioni: ["A", "B", "C", "D"],                 giusta: 1 },
-  { testo: "[PROVA 8] Domanda finale (jackpot)",             opzioni: ["A", "B", "C", "D"],                 giusta: 2 }
+  { testo: "Quanto fa 2 + 2?",                     opzioni: ["Pesce", "Banana", "Gianfranco", "4(no)"],               giusta: 2 },
+  { testo: "Qual è la capitale d’Italia?",         opzioni: ["Milano (Berlusconi)", "Milano marittima", "Ancona", "Penne"], giusta: 0 },
+  { testo: "L'uomo pesce esiste veramente?",   opzioni: ["Forse", "Sono io", "Si nasconte sotto al lago", "Sei tu sotto copertura"],   giusta: 3 },
+  { testo: "Le tasse vanno pagate",      opzioni: ["No (sono nullatenente)", "All'agenzia dell'entrate", "Sono cattolico", "Sono un cittadino onesto"], giusta: 2 },
+  { testo: "Ti trovi nel bosco, devi decidere chi affrontare",   opzioni: ["Un uomo a caso che squarta i polli", "Un velociraptor", "Un comunista", "Benjamin Netanyahu"], giusta: 1 },
+  { testo: "Qual è il tuo animale domestico preferito?",   opzioni: ["Bill Gates","Una rana velenosa ma la spacci come innocua","Renzi", "Thomas Marinucci"], giusta: 1 }
 ];
 
-/* ============================================================
-   Logica (non serve toccarla)
-   ============================================================ */
 const $ = id => document.getElementById(id);
 const euro = n => n.toLocaleString("it-IT", { minimumFractionDigits: (n % 1 ? 2 : 0), maximumFractionDigits: 2 }) + " €";
 const VIDEO_ID = "dQw4w9WgXcQ";
 let i = 0;
 let gagVisto = false;
-
+ 
 function mostra(id) {
   ["s1", "s2", "s3", "s4"].forEach(s => { $(s).hidden = (s !== id); });
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
-
-/* ---------- Pulsante che scappa per 5-7 secondi ---------- */
+ 
+/* Pulsante che scappa */
 const campo = $("campo"), btn = $("avvia"), sugg = $("suggerimento");
 let pronto = false, timerAvviato = false, fughe = 0;
 const frasi = ["Ops, troppo lento.", "Quasi!", "Non ci sperare.", "Il pulsante ha paura di te.", "Riprova (no).", "Sta scappando…", "Più piccolo, più veloce."];
-
+ 
 function misura(pct) {
   btn.style.width = pct + "%";
   btn.style.fontSize = (pct < 45 ? Math.max(.7, pct / 72) : 1) + "rem";
@@ -222,11 +320,11 @@ function centra() {
 }
 function scappa(px, py) {
   fughe++;
-  misura(Math.max(26, 72 - fughe * 8));       // ogni fuga lo rimpicciolisce
+  misura(Math.max(26, 72 - fughe * 8));
   const maxX = Math.max(0, campo.clientWidth - btn.offsetWidth);
   const maxY = Math.max(0, campo.clientHeight - btn.offsetHeight);
   let x = 0, y = 0;
-  for (let t = 0; t < 8; t++) {               // sceglie un punto lontano dal dito/mouse
+  for (let t = 0; t < 8; t++) {
     x = Math.round(Math.random() * maxX);
     y = Math.round(Math.random() * maxY);
     if (px == null) break;
@@ -257,7 +355,6 @@ function tentativo(e) {
 }
 btn.addEventListener("pointerenter", tentativo);
 btn.addEventListener("pointerdown", tentativo);
-// scappa anche quando il puntatore si avvicina (mouse) o tocca vicino (touch)
 function vicino(e) {
   if (pronto) return;
   const r = btn.getBoundingClientRect();
@@ -274,8 +371,8 @@ btn.addEventListener("click", () => {
 });
 window.addEventListener("load", centra);
 window.addEventListener("resize", () => { if (!timerAvviato || pronto) centra(); });
-
-/* ---------- Quiz ---------- */
+ 
+/* Quiz */
 function disegnaDomanda() {
   const d = DOMANDE[i];
   $("contatore").textContent = "Domanda " + (i + 1) + " di " + DOMANDE.length + " · in palio: " + PALIO[i];
@@ -296,7 +393,7 @@ function disegnaDomanda() {
     box.appendChild(b);
   });
 }
-
+ 
 function rispondi(b, k) {
   const d = DOMANDE[i];
   if (k !== d.giusta) {
@@ -312,14 +409,15 @@ function rispondi(b, k) {
   $("esito").hidden = false;
   disegnaPremio();
   $("avanti").hidden = false;
+  if (SUONI[i]) { try { new Audio(SUONI[i]).play().catch(() => {}); } catch (e) {} }
+  if (i === DOMANDE.length - 1) festa();
 }
-
+ 
 function disegnaPremio() {
-  $("premioTesto").textContent = "Hai sbloccato il livello " + (i + 1) + ": " + euro(IMPORTI[i]) + ".";
+  $("premioTesto").textContent = "Hai sbloccato il livello " + (i + 1) + ": " + PALIO[i] + ".";
   const az = $("premioAzione");
   az.textContent = "";
   if (i === 0 && !gagVisto) {
-    // Il primo premio è la finta Smartbox
     const b = document.createElement("button");
     b.type = "button";
     b.className = "oro";
@@ -330,39 +428,97 @@ function disegnaPremio() {
     const a = document.createElement("a");
     const url = LINK[i];
     a.className = "btn" + (url ? "" : " spento");
-    a.textContent = url ? "Contribuisci con " + euro(IMPORTI[i]) : "Contribuisci con " + euro(IMPORTI[i]) + " (link in arrivo)";
+    a.textContent = url ? "Contribuisci ora" : "Contribuisci ora (link in arrivo)";
     if (url) { a.href = url; a.target = "_blank"; a.rel = "noopener noreferrer"; }
     az.appendChild(a);
   }
   $("premioBox").hidden = false;
 }
-
+ 
 $("avanti").onclick = () => {
   i++;
   if (i < DOMANDE.length) { disegnaDomanda(); }
   else { $("avanz").style.width = "100%"; mostra("s3"); }
 };
+ 
+/* Festa finale: impatto, crollo torri, scossione e fuochi */
+let particelle = [], rafId = 0, spawnId = 0, avvioId = 0;
+const cv = $("fuochi"), ctx = cv.getContext("2d");
+ 
+function scoppio(x, y) {
+  const col = "hsl(" + Math.floor(Math.random() * 360) + ",100%,62%)";
+  for (let k = 0; k < 80; k++) {
+    const a = Math.random() * Math.PI * 2, v = 1 + Math.random() * 4.5;
+    particelle.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, vita: 1, col });
+  }
+}
+function ciclo() {
+  ctx.clearRect(0, 0, cv.width, cv.height);
+  particelle = particelle.filter(p => p.vita > 0);
+  particelle.forEach(p => {
+    p.x += p.vx; p.y += p.vy; p.vy += 0.045; p.vx *= 0.985; p.vita -= 0.011;
+    ctx.globalAlpha = Math.max(0, p.vita);
+    ctx.fillStyle = p.col;
+    ctx.beginPath(); ctx.arc(p.x, p.y, 2.2, 0, 6.283); ctx.fill();
+  });
+  ctx.globalAlpha = 1;
+  rafId = requestAnimationFrame(ciclo);
+}
+function festa() {
+  cv.width = window.innerWidth; cv.height = window.innerHeight;
+  particelle = [];
+  $("festa").hidden = false;
+  
+  const a = $("aereo");
+  a.style.animation = "none"; void a.getBoundingClientRect(); a.style.animation = "";
+  
+  const t1 = $("t1");
+  const t2 = $("t2");
+  const esp = $("esplosione");
+  const scena = $("scena");
 
-/* ---------- Premio fasullo con Rickroll ---------- */
+  t1.classList.remove("torre-crolla");
+  t2.classList.remove("torre-crolla");
+  esp.classList.remove("attiva-esplosione");
+  scena.classList.remove("impatto-scossa");
+  
+  cancelAnimationFrame(rafId); rafId = requestAnimationFrame(ciclo);
+  clearTimeout(avvioId); clearInterval(spawnId);
+  
+  avvioId = setTimeout(() => {
+    scena.classList.add("impatto-scossa");
+    t1.classList.add("torre-crolla");
+    t2.classList.add("torre-crolla");
+    esp.classList.add("attiva-esplosione");
+    scoppio(cv.width / 2, cv.height * 0.42);
+    
+    spawnId = setInterval(() => {
+      scoppio(cv.width * (0.1 + Math.random() * 0.8), cv.height * (0.1 + Math.random() * 0.45));
+    }, 350);
+  }, 2000);
+}
+$("chiudiFesta").onclick = () => {
+  clearTimeout(avvioId); clearInterval(spawnId); cancelAnimationFrame(rafId);
+  $("festa").hidden = true;
+};
+ 
+/* Premio fasullo con Rickroll */
 let player = null;
-
-// Carica l’API di YouTube in anticipo, così al tocco il video parte subito
 (function () {
   const t = document.createElement("script");
   t.src = "https://www.youtube.com/iframe_api";
   t.async = true;
   document.head.appendChild(t);
 })();
-
+ 
 function fermaVideo() {
   try { if (player && player.destroy) player.destroy(); } catch (e) {}
   player = null;
   $("video").textContent = "";
   $("audio").hidden = true;
 }
-
+ 
 function iframeSemplice() {
-  // Piano B se l’API non si carica: iframe normale con autoplay
   const f = document.createElement("iframe");
   f.src = "https://www.youtube-nocookie.com/embed/" + VIDEO_ID + "?autoplay=1&rel=0&playsinline=1";
   f.allow = "autoplay; encrypted-media; picture-in-picture";
@@ -371,11 +527,35 @@ function iframeSemplice() {
   $("video").textContent = "";
   $("video").appendChild(f);
 }
-
+ 
 $("ritira").onclick = () => {
-  // Il tocco è un gesto dell’utente: serve per far partire l’audio
   $("ritira").hidden = true;
   $("videoBox").hidden = false;
+  if (PREMIO_FILE) {
+    const audio = /\.(mp3|m4a|ogg|wav)$/i.test(PREMIO_FILE);
+    const el = document.createElement(audio ? "audio" : "video");
+    el.src = PREMIO_FILE;
+    el.controls = true;
+    el.autoplay = true;
+    el.playsInline = true;
+    el.style.width = "100%";
+    el.style.height = audio ? "54px" : "100%";
+    $("video").textContent = "";
+    $("video").appendChild(el);
+    if (audio) $("video").style.aspectRatio = "auto";
+    el.play().catch(() => {});
+    $("ytlink").parentElement.hidden = true;
+    el.addEventListener("error", () => {
+      $("video").style.aspectRatio = "";
+      avviaYouTube();
+    });
+    return;
+  }
+  avviaYouTube();
+};
+ 
+function avviaYouTube() {
+  $("ytlink").parentElement.hidden = false;
   if (!(window.YT && YT.Player)) { iframeSemplice(); return; }
   $("video").textContent = "";
   const div = document.createElement("div");
@@ -390,7 +570,6 @@ $("ritira").onclick = () => {
         e.target.unMute();
         e.target.setVolume(100);
         e.target.playVideo();
-        // Se dopo un attimo non sta suonando, parte muto e compare il pulsante audio
         setTimeout(() => {
           try {
             if (player && player.getPlayerState() !== 1) {
@@ -403,16 +582,16 @@ $("ritira").onclick = () => {
       }
     }
   });
-};
-
+}
+ 
 $("audio").onclick = () => {
   try { player.unMute(); player.setVolume(100); player.playVideo(); } catch (e) {}
   $("audio").hidden = true;
 };
-
+ 
 $("continua").onclick = () => {
   gagVisto = true;
-  fermaVideo();                    // ferma la musica
+  fermaVideo();
   $("ritira").hidden = false;
   $("videoBox").hidden = true;
   disegnaPremio();
